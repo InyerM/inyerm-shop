@@ -1,0 +1,8 @@
+services:
+  entriesDb:
+    image: mongo:5.0.2
+    container_name: inyermshop-db
+    ports:
+      - 27017:27017
+    volumes:
+      - ./mongo:/data/db
