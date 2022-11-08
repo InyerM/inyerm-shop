@@ -1,39 +1,64 @@
+import { useContext, useState } from 'react';
+import { useRouter } from 'next/router';
 import { Box, Divider, Drawer, IconButton, Input, InputAdornment, List, ListItem, ListItemIcon, ListItemText, ListSubheader } from "@mui/material"
 import SearchOutlined from "@mui/icons-material/SearchOutlined"
 import { clientMenu, icons, adminMenu } from "./"
+import { UIContext } from '../../context'
 
 
 export const SideMenu = () => {
+
+  const { isMenuOpen, toggleSideMenu } = useContext(UIContext)
+  const { push } = useRouter()
+
+  const [searchTerm, setSearchTerm] = useState('')
+
+  const onSearchTerm = () => {
+    if(searchTerm.trim().length === 0) return
+
+    navigateTo(`/search/${ searchTerm }`)
+  }
+
+  const navigateTo = ( url: string ) => {
+    push(url)
+    toggleSideMenu()
+  }
+
   return (
     <Drawer
-      open={ false }
+      open={ isMenuOpen }
       anchor='right'
       sx={{ backdropFilter: 'blur(4px)', transition: 'all 0.5s ease-out' }}
+      onClose={ toggleSideMenu }
     >
       <Box sx={{ width: 250, paddingTop: 5 }}>
         <List>
           <ListItem>
             <Input
-              type='text'
+              autoFocus
+              type='search'
               placeholder="Search"
               sx={{ paddingX: 1 }}
               endAdornment={
                 <InputAdornment position="end">
                   <IconButton
-                    aria-label="toggle password visibility"
+                    onClick={ onSearchTerm }
                   >
                     <SearchOutlined />
                   </IconButton>
                 </InputAdornment>
               }
+              value={ searchTerm }
+              onChange={ ( e ) => setSearchTerm( e.target.value ) }
+              onKeyUp={ ( e ) => e.key === 'Enter' ? onSearchTerm() : null }
             />
           </ListItem>
 
           {
-            clientMenu.map(({ label, icon, properties }) => {
+            clientMenu.map(({ label, icon, properties, href }) => {
               const Icon = icons[icon];
               return (
-                <ListItem button key={label} {...properties}>
+                <ListItem button key={label} onClick={ () => href ? navigateTo(href) : null } {...properties}>
                   <ListItemIcon>
                     <Icon />
                   </ListItemIcon>

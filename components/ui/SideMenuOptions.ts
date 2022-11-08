@@ -19,6 +19,7 @@ interface clientMenuItem {
   label: string
   icon: keyof typeof icons
   properties?: Object
+  href?: string
 }
 
 export const icons = {
@@ -67,6 +68,7 @@ export const clientMenu: clientMenuItem[] = [
     properties: {
       sx: { display: { xs: "", sm: "none" } },
     },
+    href: '/category/men'
   },
   {
     label: "Women",
@@ -74,6 +76,7 @@ export const clientMenu: clientMenuItem[] = [
     properties: {
       sx: { display: { xs: "", sm: "none" } },
     },
+    href: '/category/women'
   },
   {
     label: "Kids",
@@ -81,6 +84,7 @@ export const clientMenu: clientMenuItem[] = [
     properties: {
       sx: { display: { xs: "", sm: "none" } },
     },
+    href: '/category/kid'
   },
   {
     label: "Login",

@@ -1,13 +1,25 @@
-import { Box, Button, Chip, Grid, Typography } from '@mui/material'
+import { FC } from 'react'
+import { GetServerSideProps } from 'next'
+import { GetStaticProps } from 'next'
+import { GetStaticPaths } from 'next'
+import { Box, Button, Grid, Typography } from '@mui/material'
 
 import { ShopLayout } from '../../components/layout'
 import { ProductSizeSelector, ProductSlideshow } from '../../components/products'
 import { ItemCounter } from '../../components/ui'
 import { initialData } from '../../database/products'
+import { IProduct } from '../../interfaces'
+import { dbProducts } from '../../database'
+import { StringExpression } from 'mongoose'
 
 const product = initialData.products[0]
 
-const ProductPage = () => {
+interface Props {
+  product: IProduct
+}
+
+const ProductPage: FC<Props> = ({ product }) => {
+
   return (
     <ShopLayout title={ product.title } description={ product.description }>
       <Grid container spacing={ 3 }>
@@ -40,6 +52,42 @@ const ProductPage = () => {
       </Grid>
     </ShopLayout>
   )
+}
+
+
+export const getStaticPaths: GetStaticPaths = async (ctx) => {
+  const slugs = await dbProducts.getAllProductsSlug()
+
+  const paths = slugs.map((obj) => ({
+    params: { slug: obj.slug }
+  }))
+
+  return {
+    paths,
+    fallback: 'blocking'
+  }
+}
+
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const { slug = '' } = params as { slug: string }
+  const product = await dbProducts.getProductBySlug(slug)
+
+  if(!product) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false
+      }
+    }
+  }
+
+  return {
+    props: {
+      product
+    },
+    revalidate: 60 * 60 * 24
+  }
 }
 
 export default ProductPage
