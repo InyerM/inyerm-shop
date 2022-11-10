@@ -1,10 +1,17 @@
+import { useContext } from 'react'
+import { useRouter } from 'next/router'
 import { Card, CardContent, Grid, Typography, Divider, Box, Button } from '@mui/material'
 import { CartList, OrderSummary } from '../../components/cart'
 import { ShopLayout } from "../../components/layout"
+import { CartContext } from '../../context'
 
 const CartPage = () => {
+
+  const { push } = useRouter()
+  const { numberOfItems } = useContext(CartContext)
+
   return (
-    <ShopLayout title='Cart - 3' description='Shopping cart of store' >
+    <ShopLayout title={`Cart - ${ numberOfItems } ${ numberOfItems > 1 ? 'items' : 'item' }`} description='Shopping cart of store' >
       <Typography variant='h1' component='h1'>Cart</Typography>
       <Grid container sx={{ mt: 2 }}>
         <Grid item xs={ 12 } md={ 8 }>
@@ -19,7 +26,7 @@ const CartPage = () => {
               <OrderSummary />
 
               <Box sx={{ mt: 3 }}>
-                <Button color='secondary' className='circular-btn' style={{ width: '100%' }}>Checkout</Button>
+                <Button color='secondary' className='circular-btn' style={{ width: '100%' }} onClick={ () => push('/checkout/summary') }>Checkout</Button>
               </Box>
             </CardContent>
           </Card>

@@ -1,4 +1,7 @@
+import { useContext } from 'react'
 import { Grid, Typography } from '@mui/material'
+import { CartContext } from '../../context'
+import { currency } from '../../utils'
 
 interface IOrderSummaryItems {
   label: string
@@ -6,14 +9,17 @@ interface IOrderSummaryItems {
   variant?: 'body1' | 'body2' | 'caption' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'inherit' | 'overline' | 'subtitle1' | 'subtitle2' | 'button' | undefined
 }
 
-const orderSummaryItems: IOrderSummaryItems[] = [
-  { label: 'N° Products', value: '3 items' },
-  { label: 'Subtotal', value: '$ 155.81' },
-  { label: 'Tax', value: '$ 25.21' },
-  { label: 'Total', value: '$ 180.12', variant: 'subtitle1' },
-]
-
 export const OrderSummary = () => {
+
+  const { numberOfItems, subtotal, tax, total } = useContext(CartContext)
+
+  const orderSummaryItems: IOrderSummaryItems[] = [
+    { label: 'N° Products', value: `${ numberOfItems } ${ numberOfItems > 1 ? 'items' : 'item' }` },
+    { label: 'Subtotal', value: currency.format(subtotal) },
+    { label: 'Tax (15%)', value: currency.format(tax) },
+    { label: 'Total', value: currency.format(total), variant: 'subtitle1' },
+  ]
+
   return (
     <Grid container rowSpacing={1}>
       {

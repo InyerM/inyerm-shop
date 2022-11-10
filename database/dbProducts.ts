@@ -12,7 +12,7 @@ export const getProductBySlug = async (slug: string): Promise<IProduct | null> =
     await db.connect()
 
     const product = await Product.findOne({ slug })
-      .select('-_id')
+      .select('images price slug title gender sizes description inStock')
       .lean()
 
     if (!product) {

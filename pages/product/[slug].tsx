@@ -1,24 +1,70 @@
-import { FC } from 'react'
-import { GetServerSideProps } from 'next'
-import { GetStaticProps } from 'next'
-import { GetStaticPaths } from 'next'
-import { Box, Button, Grid, Typography } from '@mui/material'
+import { FC, useContext, useState } from 'react'
+import { GetStaticProps, GetStaticPaths } from 'next'
+import { useRouter } from 'next/router'
+import { Box, Button, Grid, Typography, Chip } from '@mui/material'
+import { useSnackbar } from 'notistack'
 
 import { ShopLayout } from '../../components/layout'
 import { ProductSizeSelector, ProductSlideshow } from '../../components/products'
 import { ItemCounter } from '../../components/ui'
-import { initialData } from '../../database/products'
-import { IProduct } from '../../interfaces'
+import { ICartProduct, IProduct, ISize } from '../../interfaces'
 import { dbProducts } from '../../database'
-import { StringExpression } from 'mongoose'
-
-const product = initialData.products[0]
+import { CartContext } from '../../context'
+import { snackbarConfig } from '../../config'
 
 interface Props {
   product: IProduct
 }
 
 const ProductPage: FC<Props> = ({ product }) => {
+
+  const [tempCartProduct, setTempCartProduct] = useState<ICartProduct>({
+    _id: product._id,
+    image: product.images[0],
+    price: product.price,
+    size: undefined,
+    slug: product.slug,
+    title: product.title,
+    gender: product.gender,
+    inStock: product.inStock,
+    quantity: 1,
+  })
+  
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar()
+  const { addProduct } = useContext(CartContext)
+
+  const handleSelectedSize = (size: ISize) => {
+    setTempCartProduct({
+      ...tempCartProduct,
+      size,
+    })
+  }
+
+  const onUpdateQuantity = ( quantity: number ) => {
+    setTempCartProduct( currentProduct => ({
+      ...currentProduct,
+      quantity
+    }));
+  }
+
+  const handleAddToCart = () => {
+    if(!tempCartProduct.size) {
+      enqueueSnackbar('You must to select a size', {
+        variant: 'error',
+        ...snackbarConfig,
+        onClose: () => closeSnackbar(),
+      })
+      return
+    }
+
+    addProduct(tempCartProduct)
+
+    enqueueSnackbar('Updated successfully to your cart', {
+      variant: 'success',
+      ...snackbarConfig,
+      onClose: () => closeSnackbar(),
+    })
+  }
 
   return (
     <ShopLayout title={ product.title } description={ product.description }>
@@ -34,15 +80,26 @@ const ProductPage: FC<Props> = ({ product }) => {
 
             <Box sx={{ my: 2 }}>
               <Typography variant='subtitle2'>Quantity</Typography>
-              <ItemCounter />
-              <ProductSizeSelector sizes={ product.sizes } />
+              <ItemCounter 
+                currentValue={ tempCartProduct.quantity } 
+                maxValue={ product.inStock }
+                handleQuantity={ onUpdateQuantity }
+              />
+              <ProductSizeSelector sizes={ product.sizes } selectedSize={ tempCartProduct.size } onSelectedSize={ handleSelectedSize }/>
             </Box>
 
-            <Button color='secondary' className='circular-btn'>
-              Add to cart
-            </Button>
+            {
+              product.inStock === 0 ? (
+                <Chip label='Not available' color='error' />
+              ) : (
+                <Button color='secondary' className='circular-btn' onClick={ handleAddToCart }>
+                  {
+                    tempCartProduct.size ? 'Add to cart' : 'Select size'
+                  }
+                </Button>
+              )
+            }
 
-            {/* <Chip label='There is no stock' color='error' variant='outlined' /> */}
             <Box sx={{ mt: 3 }}>
               <Typography variant='subtitle2'>Description</Typography>
               <Typography variant='body2'>{ product.description }</Typography>
