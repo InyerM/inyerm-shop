@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react';
 import { useRouter } from 'next/router'
 import { Card, CardContent, Grid, Typography, Divider, Box, Button } from '@mui/material'
 import { CartList, OrderSummary } from '../../components/cart'
@@ -9,6 +9,13 @@ const CartPage = () => {
 
   const { push } = useRouter()
   const { numberOfItems } = useContext(CartContext)
+
+  useEffect(() => {
+    if(numberOfItems === 0) {
+      push('/cart/empty')
+    }
+  }, [numberOfItems])
+  
 
   return (
     <ShopLayout title={`Cart - ${ numberOfItems } ${ numberOfItems > 1 ? 'items' : 'item' }`} description='Shopping cart of store' >

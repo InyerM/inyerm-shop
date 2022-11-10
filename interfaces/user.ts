@@ -7,3 +7,11 @@ export interface IUser {
   createdAt?: string
   updatedAt?: string
 }
+
+export interface IAuthResponse {
+  token: string
+  user: IAuthUser
+  message: string
+}
+
+export type IAuthUser = Pick<IUser, 'name' | 'email' | 'role'>

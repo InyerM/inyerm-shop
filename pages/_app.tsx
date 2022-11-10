@@ -4,7 +4,7 @@ import { SWRConfig } from 'swr'
 import { SnackbarProvider } from 'notistack'
 
 import { lightTheme } from '../themes'
-import { UIProvider, CartProvider } from '../context'
+import { UIProvider, CartProvider, AuthProvider } from '../context'
 import '../styles/globals.css'
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -16,12 +16,14 @@ export default function App({ Component, pageProps }: AppProps) {
         }}
       >
         <UIProvider>
-          <CartProvider>
-            <ThemeProvider theme={ lightTheme }>
-              <CssBaseline />
-              <Component { ...pageProps } />
-            </ThemeProvider>
-          </CartProvider>
+          <AuthProvider>
+            <CartProvider>
+              <ThemeProvider theme={ lightTheme }>
+                <CssBaseline />
+                <Component { ...pageProps } />
+              </ThemeProvider>
+            </CartProvider>
+          </AuthProvider>
         </UIProvider>
       </SWRConfig>
     </SnackbarProvider>
