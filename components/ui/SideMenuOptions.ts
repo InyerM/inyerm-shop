@@ -20,6 +20,8 @@ interface clientMenuItem {
   icon: keyof typeof icons
   properties?: Object
   href?: string
+  auth: boolean
+  notLogged: boolean
 }
 
 export const icons = {
@@ -57,10 +59,14 @@ export const clientMenu: clientMenuItem[] = [
   {
     label: "Profile",
     icon: "AccountCircleOutlined",
+    auth: true,
+    notLogged: false,
   },
   {
     label: "My orders",
     icon: "ConfirmationNumberOutlined",
+    auth: true,
+    notLogged: false,
   },
   {
     label: "Men",
@@ -68,7 +74,9 @@ export const clientMenu: clientMenuItem[] = [
     properties: {
       sx: { display: { xs: "", sm: "none" } },
     },
-    href: '/category/men'
+    href: '/category/men',
+    auth: false,
+    notLogged: false,
   },
   {
     label: "Women",
@@ -76,7 +84,9 @@ export const clientMenu: clientMenuItem[] = [
     properties: {
       sx: { display: { xs: "", sm: "none" } },
     },
-    href: '/category/women'
+    href: '/category/women',
+    auth: false,
+    notLogged: false,
   },
   {
     label: "Kids",
@@ -84,14 +94,21 @@ export const clientMenu: clientMenuItem[] = [
     properties: {
       sx: { display: { xs: "", sm: "none" } },
     },
-    href: '/category/kid'
+    href: '/category/kid',
+    auth: false,
+    notLogged: false,
   },
   {
     label: "Login",
     icon: "VpnKeyOutlined",
+    auth: false,
+    href: '/auth/login',
+    notLogged: true,
   },
   {
     label: "Logout",
     icon: "LoginOutlined",
+    auth: true,
+    notLogged: false,
   },
 ];

@@ -15,6 +15,10 @@ export const verifyToken = (token: string): Promise<string> => {
     throw new Error(`There isn't jwt secret`)
   }
 
+  if( token.length <= 10 ){
+    return Promise.reject('Token is not valid')
+  }
+
   return new Promise(
     (resolve, reject) => {
       try {

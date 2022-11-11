@@ -1,16 +1,18 @@
 import { FC, useEffect, useReducer } from 'react'
 import { useSnackbar } from 'notistack'
 import Cookie from 'js-cookie'
-import { ICartProduct } from '../../interfaces'
+import { ICartProduct, IShippingAddress } from '../../interfaces'
 import { CartContext, cartReducer } from './'
 import { snackbarConfig } from '../../config'
 
 export interface CartState {
+  isLoaded: boolean
   cart: ICartProduct[]
   numberOfItems: number
   subtotal: number
   tax: number
   total: number
+  shippingAddress?: IShippingAddress
 }
 
 interface Props {
@@ -18,11 +20,13 @@ interface Props {
 }
 
 const CART_INITIAL_STATE: CartState = {
+  isLoaded: false,
   cart: Cookie.get('cart') ? JSON.parse(Cookie.get('cart')!) : [],
   numberOfItems: 0,
   subtotal: 0,
   tax: 0,
   total: 0,
+  shippingAddress: undefined,
 }
 
 export const CartProvider: FC<Props> = ({ children }) => {
@@ -38,7 +42,10 @@ export const CartProvider: FC<Props> = ({ children }) => {
       dispatch({ type: 'CART_LOADCART_FROM_COOKIES_STORAGE', payload: [] })
     }
   }, [])
-  
+
+  useEffect(() => {
+    loadAddress()
+  }, [])
 
   useEffect(() => {
     const numberOfItems = state.cart.reduce((prev, current) => current.quantity + prev, 0)
@@ -58,10 +65,45 @@ export const CartProvider: FC<Props> = ({ children }) => {
     
   }, [state.cart])
 
-
   useEffect(() => {
     Cookie.set('cart', JSON.stringify( state.cart ))
   }, [state.cart])
+
+  const loadAddress = () => {
+    if (Cookie.get('firstName') !== undefined) {
+      const shippingAddress = {
+        firstName: Cookie.get('firstName') || '',
+        lastName: Cookie.get('lastName') || '',
+        address: Cookie.get('address') || '',
+        address2: Cookie.get('address2') || '',
+        city: Cookie.get('city') || '',
+        zip: Cookie.get('zip') || '',
+        country: Cookie.get('country') || '',
+        phone: Cookie.get('phone') || '',
+      }
+  
+      dispatch({
+        type: 'CART_LOAD_ADDRESS_FROM_COOKIES',
+        payload: shippingAddress
+      })
+    }
+  }
+
+  const updateAddress = ( address: IShippingAddress ) => {
+    Cookie.set('firstName', address.firstName)
+    Cookie.set('lastName', address.lastName)
+    Cookie.set('address', address.address)
+    Cookie.set('address2', address.address2 || '')
+    Cookie.set('zip', address.zip)
+    Cookie.set('city', address.city)
+    Cookie.set('country', address.country)
+    Cookie.set('phone', address.phone)
+    
+    dispatch({
+      type: 'CART_UPDATE_ADDRESS',
+      payload: address
+    })
+  }
 
   const addProduct = (product: ICartProduct) => {
     try {
@@ -149,6 +191,7 @@ export const CartProvider: FC<Props> = ({ children }) => {
       addProduct,
       updateCartQuantity,
       deleteCartProduct,
+      updateAddress,
     }}>
       { children }
     </CartContext.Provider>

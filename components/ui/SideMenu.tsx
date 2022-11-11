@@ -3,13 +3,14 @@ import { useRouter } from 'next/router';
 import { Box, Divider, Drawer, IconButton, Input, InputAdornment, List, ListItem, ListItemIcon, ListItemText, ListSubheader } from "@mui/material"
 import SearchOutlined from "@mui/icons-material/SearchOutlined"
 import { clientMenu, icons, adminMenu } from "./"
-import { UIContext } from '../../context'
+import { AuthContext, UIContext } from '../../context'
 
 
 export const SideMenu = () => {
 
   const { isMenuOpen, toggleSideMenu } = useContext(UIContext)
-  const { push } = useRouter()
+  const { isLoggedIn, user, logout } = useContext(AuthContext)
+  const { push, asPath } = useRouter()
 
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -20,9 +21,10 @@ export const SideMenu = () => {
   }
 
   const navigateTo = ( url: string ) => {
-    push(url)
     toggleSideMenu()
+    push(url)
   }
+
 
   return (
     <Drawer
@@ -55,35 +57,50 @@ export const SideMenu = () => {
           </ListItem>
 
           {
-            clientMenu.map(({ label, icon, properties, href }) => {
-              const Icon = icons[icon];
+            clientMenu.map(({ label, icon, properties, href, auth, notLogged }) => {
+              const Icon = icons[icon]
+
+              if(auth && !isLoggedIn) return null
+
+              if(notLogged && isLoggedIn) return null
+
               return (
-                <ListItem button key={label} onClick={ () => href ? navigateTo(href) : null } {...properties}>
+                <ListItem 
+                  button 
+                  key={label} 
+                  onClick={ () => href ? navigateTo(label === 'Login' ? `${ href }?p=${ asPath }`: href) : label === 'Logout' ? logout() : null } 
+                  {...properties}>
                   <ListItemIcon>
                     <Icon />
                   </ListItemIcon>
                   <ListItemText primary={label} />
                 </ListItem>
-              );
+              )
             })
           }
 
           {/* Admin */}
           <Divider />
-          <ListSubheader>Admin Panel</ListSubheader>
-
           {
-            adminMenu.map(({ label, icon }) => {
-              const Icon = icons[icon];
-              return (
-                <ListItem button key={label}>
-                  <ListItemIcon>
-                    <Icon />
-                  </ListItemIcon>
-                  <ListItemText primary={label} />
-                </ListItem>
-              );
-            })
+            user?.role === 'admin' && (
+              <>
+                <ListSubheader>Admin Panel</ListSubheader>
+  
+                {
+                  adminMenu.map(({ label, icon }) => {
+                    const Icon = icons[icon];
+                    return (
+                      <ListItem button key={label}>
+                        <ListItemIcon>
+                          <Icon />
+                        </ListItemIcon>
+                        <ListItemText primary={label} />
+                      </ListItem>
+                    );
+                  })
+                }
+              </>
+            )
           }
 
         </List>

@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useMemo } from 'react';
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useForm } from 'react-hook-form'
@@ -7,8 +7,6 @@ import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined'
 import { AuthLayout } from "../../components/layout"
 import { AuthContext } from '../../context'
 import { validations } from '../../utils'
-import { shopApi } from '../../api'
-import { IAuthResponse } from '../../interfaces'
 
 interface FormData {
   email: string
@@ -38,7 +36,7 @@ const LoginPage = () => {
       return
     }
 
-    router.replace('/')
+    router.replace(router.query.p?.toString() || '/')
   }
 
   return (
@@ -109,7 +107,9 @@ const LoginPage = () => {
               </Button>
             </Grid>
             <Grid item xs={12} display='flex' justifyContent='center'>
-              <Link href='/auth/register' style={{ textDecoration: 'none', color: 'secondary.main' }}>
+              <Link href={ 
+                router.query.p ? `/auth/register?p=${ router.query.p?.toString() || '/' }` : '/auth/register' } 
+                style={{ textDecoration: 'none', color: 'secondary.main' }}>
                 Don't have an account? Register
               </Link>
             </Grid>

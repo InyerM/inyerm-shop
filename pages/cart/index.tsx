@@ -7,15 +7,18 @@ import { CartContext } from '../../context'
 
 const CartPage = () => {
 
-  const { push } = useRouter()
-  const { numberOfItems } = useContext(CartContext)
+  const { replace, push } = useRouter()
+  const { numberOfItems, isLoaded } = useContext(CartContext)
 
   useEffect(() => {
-    if(numberOfItems === 0) {
-      push('/cart/empty')
+    if(numberOfItems === 0 && isLoaded) {
+      replace('/cart/empty')
     }
-  }, [numberOfItems])
+  }, [numberOfItems, isLoaded, replace])
   
+  if(numberOfItems === 0 || !isLoaded) {
+    return null
+  }
 
   return (
     <ShopLayout title={`Cart - ${ numberOfItems } ${ numberOfItems > 1 ? 'items' : 'item' }`} description='Shopping cart of store' >
@@ -33,7 +36,14 @@ const CartPage = () => {
               <OrderSummary />
 
               <Box sx={{ mt: 3 }}>
-                <Button color='secondary' className='circular-btn' style={{ width: '100%' }} onClick={ () => push('/checkout/summary') }>Checkout</Button>
+                <Button 
+                  color='secondary' 
+                  className='circular-btn' 
+                  style={{ width: '100%' }} 
+                  onClick={ () => push('/checkout/address') }
+                >
+                  Checkout
+                </Button>
               </Box>
             </CardContent>
           </Card>

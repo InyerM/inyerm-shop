@@ -1,9 +1,21 @@
+import { useContext } from 'react'
 import Link from "next/link"
 import { Typography, Grid, Card, CardContent, Divider, Box, Button } from "@mui/material"
 import { CartList, OrderSummary } from "../../components/cart"
 import { ShopLayout } from "../../components/layout"
+import { CartContext } from '../../context'
+import { countries } from '../../utils'
 
 const SummaryPage = () => {
+
+  const { shippingAddress, numberOfItems } = useContext(CartContext)
+
+  if (!shippingAddress) {
+    return <></>
+  }
+
+  const { firstName, lastName, address, address2 = '', city, country, zip, phone } = shippingAddress
+
   return (
     <ShopLayout title='Order Summary' description='Order summary' >
       <Typography variant='h1' component='h1'>Order Summary</Typography>
@@ -14,7 +26,7 @@ const SummaryPage = () => {
         <Grid item xs={ 12 } md={ 4 }>
           <Card className='summary-card'>
             <CardContent>
-              <Typography variant='h5' component='h2'>Summary (3 products)</Typography>
+              <Typography variant='h5' component='h2'>Summary ({ numberOfItems }{ numberOfItems > 1 ? 'products' : 'product' })</Typography>
               <Divider sx={{ my: 1 }}/>
 
               <Box display='flex' justifyContent='space-between' sx={{ mb: 1 }}>
@@ -24,11 +36,11 @@ const SummaryPage = () => {
                 </Link>
               </Box>
 
-              <Typography>Inyer Marin</Typography>
-              <Typography>3232 some place</Typography>
-              <Typography>Pereira 660006</Typography>
-              <Typography>Colombia</Typography>
-              <Typography>+57 3195963135</Typography>
+              <Typography>{ `${ firstName } ${ lastName }` }</Typography>
+              <Typography>{ `${ address }${ address2 ? `, ${ address2 }` : '' }` }</Typography>
+              <Typography>{ `${ city } - ${ zip }` }</Typography>
+              <Typography>{ countries.find((c) => c.code === country )?.name }</Typography>
+              <Typography>{ phone }</Typography>
 
               <Divider sx={{ my: 1 }}/>
 
