@@ -1,8 +1,11 @@
-import { useState, useContext } from 'react'
+import { useState, useContext, useEffect } from 'react'
+import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { getProviders, getSession, signIn } from 'next-auth/react'
+
 import { useForm } from 'react-hook-form'
-import { Box, Grid, Typography, TextField, Button, Chip } from '@mui/material'
+import { Box, Grid, Typography, TextField, Button, Chip, Divider } from '@mui/material'
 import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined'
 import { AuthLayout } from "../../components/layout"
 import { validations } from '../../utils'
@@ -23,6 +26,11 @@ const RegisterPage = () => {
   const [showError, setShowError] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+  const [providers, setProviders] = useState<any>({})
+
+  useEffect(() => {
+    getProviders().then((data) => setProviders(data))
+  }, [])
 
   const onRegister = async({ email, password, name }: FormData) => {
     setIsLoading(true)
@@ -40,7 +48,11 @@ const RegisterPage = () => {
       return
     }
 
-    router.replace(router.query.p?.toString() || '/')
+    await signIn('credentials', {
+      email,
+      password,
+    })
+    // router.replace(router.query.p?.toString() || '/')
   }
   
   return (
@@ -135,11 +147,54 @@ const RegisterPage = () => {
                 Already have an account? Login
               </Link>
             </Grid>
+
+            <Grid item xs={12} display='flex' justifyContent='center' flexDirection='column'>
+              <Divider sx={{ width: '100%', mb: 2 }}/>
+
+              {
+                Object.values(providers).map((provider: any) => {
+                  if (provider.name === 'Credentials') return null
+
+                  return (
+                    <Button
+                      key={ provider.name }
+                      onClick={ () => signIn( provider.id ) }
+                      variant='outlined'
+                      color='secondary'
+                      sx={{ mb: 1, borderRadius: '30px' }}
+                    >
+                      Login with { provider.name }
+                    </Button>
+                  )
+                })
+              }
+            </Grid>
           </Grid>
         </Box>
       </form>
     </AuthLayout>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async ({ req, query }) => {
+  
+  const session = await getSession({ req })
+
+  const { p = '/' } = query
+
+  if (session) {
+    return {
+      redirect: {
+        destination: p.toString(),
+        permanent: false
+      }
+    }
+  }
+
+  return {
+    props: {
+    }
+  }
 }
 
 export default RegisterPage

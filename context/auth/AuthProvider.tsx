@@ -1,4 +1,5 @@
 import { FC, useReducer, useEffect } from 'react'
+import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import Cookies from 'js-cookie'
 import axios from 'axios'
@@ -27,10 +28,19 @@ export const AuthProvider: FC<Props> = ({ children }) => {
   const [state, dispatch] = useReducer( authReducer, AUTH_INITIAL_STATE )
   const { enqueueSnackbar, closeSnackbar } = useSnackbar()
   const router = useRouter()
+  const { data, status } = useSession()
 
   useEffect(() => {
-    checkToken()
-  }, [])
+    if ( status === 'authenticated' ) {
+      dispatch({ type: 'AUTH_LOGIN', payload: data?.user as IAuthUser })
+    }
+
+  }, [data, status])
+  
+
+  // useEffect(() => {
+  //   checkToken()
+  // }, [])
 
   const checkToken = async () => {
     const token = Cookies.get('token')
@@ -112,9 +122,18 @@ export const AuthProvider: FC<Props> = ({ children }) => {
   }
 
   const logout = () => {
-    Cookies.remove('token')
+    // Cookies.remove('token')
     Cookies.remove('cart')
-    router.reload()
+    Cookies.remove('firstName')
+    Cookies.remove('lastName')
+    Cookies.remove('address')
+    Cookies.remove('address2')
+    Cookies.remove('zip')
+    Cookies.remove('city')
+    Cookies.remove('country')
+    Cookies.remove('phone')
+    signOut()
+    // router.reload()
   }
 
   return (

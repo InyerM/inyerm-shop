@@ -8,6 +8,7 @@ import LoginOutlined from "@mui/icons-material/LoginOutlined"
 import MaleOutlined from "@mui/icons-material/MaleOutlined"
 import SearchOutlined from "@mui/icons-material/SearchOutlined"
 import VpnKeyOutlined from "@mui/icons-material/VpnKeyOutlined"
+import HowToRegOutlinedIcon from '@mui/icons-material/HowToRegOutlined';
 
 interface adminMenuItem {
   label: string
@@ -35,6 +36,7 @@ export const icons = {
   MaleOutlined,
   SearchOutlined,
   VpnKeyOutlined,
+  HowToRegOutlinedIcon
 }
 
 export const adminMenu: adminMenuItem[] = [
@@ -111,4 +113,11 @@ export const clientMenu: clientMenuItem[] = [
     auth: true,
     notLogged: false,
   },
+  {
+    label: "Register",
+    icon: "HowToRegOutlinedIcon",
+    auth: false,
+    href: '/auth/register',
+    notLogged: true,
+  }
 ];
