@@ -1,13 +1,15 @@
 import { FC, useContext, useEffect, useState } from 'react'
 
 import { CartContext } from '../../context'
+import { IOrderItem } from '../../interfaces'
 import { CartProduct } from './'
 
 interface Props {
   editable?: boolean
+  products?: IOrderItem[]
 }
 
-export const CartList: FC<Props> = ({ editable = false }) => {
+export const CartList: FC<Props> = ({ editable = false, products }) => {
 
   const { cart } = useContext(CartContext)
 
@@ -17,10 +19,14 @@ export const CartList: FC<Props> = ({ editable = false }) => {
     setHasMounted(true)
   }, [])
 
+  const productsToRender = products ? products : cart
+  console.log("🚀 ~ file: CartList.tsx:23 ~ productsToRender", productsToRender)
+  console.log("🚀 ~ file: CartList.tsx:23 ~ productsToRender", productsToRender)
+
   return (
     <>
       {
-        hasMounted && cart.map((product) => {
+        hasMounted && productsToRender.map((product) => {
           return (
             <CartProduct product={ product } editable={ editable } key={ product.slug + product.size }/>
           )

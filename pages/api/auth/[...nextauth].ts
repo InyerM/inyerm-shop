@@ -45,7 +45,8 @@ export const authOptions: NextAuthOptions = {
             break
 
           case 'oauth':
-            await dbUsers.OAuthToDbUser( user?.email || '', user?.name || '' )
+            const oauthUser = await dbUsers.OAuthToDbUser( user?.email || '', user?.name || '' )
+            token.user = oauthUser
             break
         }
       }

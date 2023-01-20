@@ -36,6 +36,9 @@
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
     "@types/js-cookie": "^3.0.2",
-    "@types/jsonwebtoken": "^8.5.9"
+    "@types/jsonwebtoken": "^8.5.9",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.8.3"
   }
 }

@@ -1,69 +1,83 @@
-import { ICartProduct, IShippingAddress } from '../../interfaces'
-import { CartState } from './CartProvider'
+import { ICartProduct, IShippingAddress } from "../../interfaces"
+import { CartState } from "./CartProvider"
 
-type CartAction = 
-{ type: 'CART_LOADCART_FROM_COOKIES_STORAGE', payload: ICartProduct[] } |
-{ type: 'CART_UPDATE_PRODUCTS', payload: ICartProduct[] } |
-{ type: 'CART_UPDATE_PRODUCT_QUANTITY', payload: ICartProduct } |
-{ type: 'CART_DELETE_PRODUCT', payload: ICartProduct } |
-{ 
-  type: 'CART_UPDATE_ORDER_SUMMARY', 
-  payload: {
-    numberOfItems: number
-    subtotal: number
-    tax: number
-    total: number
-  } 
-} |
-{ type: 'CART_LOAD_ADDRESS_FROM_COOKIES', payload: IShippingAddress } |
-{ type: 'CART_UPDATE_ADDRESS', payload: IShippingAddress }
+type CartAction =
+  | { type: "CART_LOADCART_FROM_COOKIES_STORAGE"; payload: ICartProduct[] }
+  | { type: "CART_UPDATE_PRODUCTS"; payload: ICartProduct[] }
+  | { type: "CART_UPDATE_PRODUCT_QUANTITY"; payload: ICartProduct }
+  | { type: "CART_DELETE_PRODUCT"; payload: ICartProduct }
+  | {
+      type: "CART_UPDATE_ORDER_SUMMARY"
+      payload: {
+        numberOfItems: number
+        subtotal: number
+        tax: number
+        total: number
+      }
+    }
+  | { type: "CART_LOAD_ADDRESS_FROM_COOKIES"; payload: IShippingAddress }
+  | { type: "CART_UPDATE_ADDRESS"; payload: IShippingAddress }
+  | { type: "CART_ORDER_COMPLETE" }
 
 export const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
-    case 'CART_LOADCART_FROM_COOKIES_STORAGE':
+    case "CART_LOADCART_FROM_COOKIES_STORAGE":
       return {
         ...state,
         isLoaded: true,
-        cart: [...action.payload]
+        cart: [...action.payload],
       }
-    case 'CART_UPDATE_PRODUCTS':
+    case "CART_UPDATE_PRODUCTS":
       return {
         ...state,
-        cart: [...action.payload]
+        cart: [...action.payload],
       }
-    case 'CART_UPDATE_PRODUCT_QUANTITY':
+    case "CART_UPDATE_PRODUCT_QUANTITY":
       return {
         ...state,
-        cart: state.cart.map( product => {
+        cart: state.cart.map((product) => {
           if (product._id !== action.payload._id) return product
           if (product.size !== action.payload.size) return product
 
           return action.payload
-        })
+        }),
       }
 
-    case 'CART_DELETE_PRODUCT':
+    case "CART_DELETE_PRODUCT":
       return {
         ...state,
-        cart: state.cart.filter( product => !(product._id === action.payload._id && product.size === action.payload.size))
-      }
-    
-    case 'CART_UPDATE_ORDER_SUMMARY':
-      return {
-        ...state,
-        ...action.payload
+        cart: state.cart.filter(
+          (product) =>
+            !(product._id === action.payload._id && product.size === action.payload.size),
+        ),
       }
 
-    case 'CART_LOAD_ADDRESS_FROM_COOKIES':
+    case "CART_UPDATE_ORDER_SUMMARY":
       return {
         ...state,
-        shippingAddress: action.payload
+        ...action.payload,
       }
 
-    case 'CART_UPDATE_ADDRESS':
+    case "CART_LOAD_ADDRESS_FROM_COOKIES":
       return {
         ...state,
-        shippingAddress: action.payload
+        shippingAddress: action.payload,
+      }
+
+    case "CART_UPDATE_ADDRESS":
+      return {
+        ...state,
+        shippingAddress: action.payload,
+      }
+
+    case "CART_ORDER_COMPLETE":
+      return {
+        ...state,
+        cart: [],
+        numberOfItems: 0,
+        subtotal: 0,
+        tax: 0,
+        total: 0,
       }
     default:
       return state

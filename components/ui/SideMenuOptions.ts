@@ -8,7 +8,7 @@ import LoginOutlined from "@mui/icons-material/LoginOutlined"
 import MaleOutlined from "@mui/icons-material/MaleOutlined"
 import SearchOutlined from "@mui/icons-material/SearchOutlined"
 import VpnKeyOutlined from "@mui/icons-material/VpnKeyOutlined"
-import HowToRegOutlinedIcon from '@mui/icons-material/HowToRegOutlined';
+import HowToRegOutlinedIcon from "@mui/icons-material/HowToRegOutlined"
 
 interface adminMenuItem {
   label: string
@@ -36,24 +36,24 @@ export const icons = {
   MaleOutlined,
   SearchOutlined,
   VpnKeyOutlined,
-  HowToRegOutlinedIcon
+  HowToRegOutlinedIcon,
 }
 
 export const adminMenu: adminMenuItem[] = [
   {
     label: "Products",
     icon: "CategoryOutlined",
-    url: ''
+    url: "",
   },
   {
     label: "Orders",
     icon: "ConfirmationNumberOutlined",
-    url: ''
+    url: "",
   },
   {
     label: "Users",
     icon: "AdminPanelSettings",
-    url: ''
+    url: "",
   },
 ]
 
@@ -67,6 +67,7 @@ export const clientMenu: clientMenuItem[] = [
   {
     label: "My orders",
     icon: "ConfirmationNumberOutlined",
+    href: "/orders/history",
     auth: true,
     notLogged: false,
   },
@@ -76,7 +77,7 @@ export const clientMenu: clientMenuItem[] = [
     properties: {
       sx: { display: { xs: "", sm: "none" } },
     },
-    href: '/category/men',
+    href: "/category/men",
     auth: false,
     notLogged: false,
   },
@@ -86,7 +87,7 @@ export const clientMenu: clientMenuItem[] = [
     properties: {
       sx: { display: { xs: "", sm: "none" } },
     },
-    href: '/category/women',
+    href: "/category/women",
     auth: false,
     notLogged: false,
   },
@@ -96,7 +97,7 @@ export const clientMenu: clientMenuItem[] = [
     properties: {
       sx: { display: { xs: "", sm: "none" } },
     },
-    href: '/category/kid',
+    href: "/category/kid",
     auth: false,
     notLogged: false,
   },
@@ -104,7 +105,7 @@ export const clientMenu: clientMenuItem[] = [
     label: "Login",
     icon: "VpnKeyOutlined",
     auth: false,
-    href: '/auth/login',
+    href: "/auth/login",
     notLogged: true,
   },
   {
@@ -117,7 +118,7 @@ export const clientMenu: clientMenuItem[] = [
     label: "Register",
     icon: "HowToRegOutlinedIcon",
     auth: false,
-    href: '/auth/register',
+    href: "/auth/register",
     notLogged: true,
-  }
-];
+  },
+]
