@@ -1,20 +1,76 @@
+import { useState } from "react"
 import { GetServerSideProps, NextPage } from "next"
-import { Typography, Grid, Card, CardContent, Divider, Box, Button, Chip } from "@mui/material"
+import { useRouter } from "next/router"
+import { getSession } from "next-auth/react"
+import { PayPalButtons } from "@paypal/react-paypal-js"
+import {
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  Divider,
+  Box,
+  Chip,
+  CircularProgress,
+} from "@mui/material"
 import CreditCardOffOutlined from "@mui/icons-material/CreditCardOffOutlined"
 import CreditCardOutlined from "@mui/icons-material/CreditCardOutlined"
+import { useSnackbar } from "notistack"
+
 import { CartList, OrderSummary } from "../../components/cart"
 import { ShopLayout } from "../../components/layout"
-import { getSession } from "next-auth/react"
 import { dbOrders } from "../../database"
 import { IOrder } from "../../interfaces"
 import { countries } from "../../utils"
+import { snackbarConfig } from "../../config"
+import { shopApi } from "../../api"
 
+export interface OrderResponseBody {
+  id: string
+  status: "COMPLETED" | "SAVED" | "APPROVED" | "VOIDED" | "COMPLETED" | "PAYER_ACTION_REQUIRED"
+}
 interface Props {
   order: IOrder
 }
 
 const OrderPage: NextPage<Props> = ({ order }) => {
   const { shippingAddress } = order
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar()
+  const router = useRouter()
+  const [isPaying, setIsPaying] = useState(false)
+
+  const onOrderCompleted = async (details: OrderResponseBody) => {
+    if (details.status !== "COMPLETED")
+      enqueueSnackbar("Payment was not completed", {
+        variant: "error",
+        ...snackbarConfig,
+        onClose: () => closeSnackbar(),
+      })
+    setIsPaying(true)
+
+    try {
+      const { data } = await shopApi.post(`/orders/pay`, {
+        orderId: order._id,
+        transactionId: details.id,
+      })
+
+      enqueueSnackbar("Payment was completed", {
+        variant: "success",
+        ...snackbarConfig,
+        onClose: () => closeSnackbar(),
+      })
+
+      router.reload()
+    } catch (error) {
+      enqueueSnackbar("Payment was not completed, there was an error", {
+        variant: "error",
+        ...snackbarConfig,
+        onClose: () => closeSnackbar(),
+      })
+      setIsPaying(false)
+    }
+  }
+
   return (
     <ShopLayout title="Summary of order" description="Summary of order">
       <Typography variant="h1" component="h1">
@@ -76,19 +132,40 @@ const OrderPage: NextPage<Props> = ({ order }) => {
               </Box>
               <OrderSummary order={order} />
               <Box sx={{ mt: 3 }} display="flex" flexDirection="column">
-                {order.isPaid ? (
-                  <Chip
-                    sx={{ my: 2, p: 2 }}
-                    label="Order has been paid"
-                    variant="outlined"
-                    color="success"
-                    icon={<CreditCardOutlined />}
-                  />
-                ) : (
-                  <Button color="secondary" className="circular-btn" style={{ width: "100%" }}>
-                    Go to pay
-                  </Button>
-                )}
+                <Box
+                  justifyContent="center"
+                  className="fadeIn"
+                  sx={{ display: isPaying ? "flex" : "none" }}>
+                  <CircularProgress />
+                </Box>
+                <Box sx={{ display: isPaying ? "none" : "flex", flex: 1 }} flexDirection="column">
+                  {order.isPaid ? (
+                    <Chip
+                      sx={{ my: 2, p: 2 }}
+                      label="Order has been paid"
+                      variant="outlined"
+                      color="success"
+                      icon={<CreditCardOutlined />}
+                    />
+                  ) : (
+                    <PayPalButtons
+                      createOrder={(data, actions) => {
+                        return actions.order.create({
+                          purchase_units: [
+                            {
+                              amount: {
+                                value: `${order.total}`,
+                              },
+                            },
+                          ],
+                        })
+                      }}
+                      onApprove={(data, actions) => {
+                        return actions.order!.capture().then(onOrderCompleted)
+                      }}
+                    />
+                  )}
+                </Box>
               </Box>
             </CardContent>
           </Card>
