@@ -9,6 +9,7 @@ import MaleOutlined from "@mui/icons-material/MaleOutlined"
 import SearchOutlined from "@mui/icons-material/SearchOutlined"
 import VpnKeyOutlined from "@mui/icons-material/VpnKeyOutlined"
 import HowToRegOutlinedIcon from "@mui/icons-material/HowToRegOutlined"
+import DashboardOutlined from "@mui/icons-material/DashboardOutlined"
 
 interface adminMenuItem {
   label: string
@@ -28,7 +29,6 @@ interface clientMenuItem {
 export const icons = {
   AccountCircleOutlined,
   AdminPanelSettings,
-  CategoryOutlined,
   ConfirmationNumberOutlined,
   EscalatorWarningOutlined,
   FemaleOutlined,
@@ -37,13 +37,14 @@ export const icons = {
   SearchOutlined,
   VpnKeyOutlined,
   HowToRegOutlinedIcon,
+  DashboardOutlined,
 }
 
 export const adminMenu: adminMenuItem[] = [
   {
-    label: "Products",
-    icon: "CategoryOutlined",
-    url: "",
+    label: "Dashboard",
+    icon: "DashboardOutlined",
+    url: "/admin/",
   },
   {
     label: "Orders",
