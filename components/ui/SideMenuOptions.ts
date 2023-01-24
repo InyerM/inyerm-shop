@@ -49,12 +49,12 @@ export const adminMenu: adminMenuItem[] = [
   {
     label: "Orders",
     icon: "ConfirmationNumberOutlined",
-    url: "",
+    url: "/admin/orders/",
   },
   {
     label: "Users",
     icon: "AdminPanelSettings",
-    url: "",
+    url: "/admin/users/",
   },
 ]
 

@@ -1,21 +1,17 @@
-import { NextResponse, NextRequest } from 'next/server'
-import { getToken } from 'next-auth/jwt'
+import { NextResponse, NextRequest } from "next/server"
+import { adminMiddleware, checkoutMiddleware } from "./middlewares"
 
 export async function middleware(req: NextRequest) {
-  if( req.nextUrl.pathname.startsWith('/checkout') ) {
-    const session = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
-    if( !session ) {
-      const { protocol, host, pathname } = req.nextUrl
+  const nextPathname = req.nextUrl.pathname
+  const { protocol, host, pathname } = req.nextUrl
+  if (nextPathname.startsWith("/checkout"))
+    return await checkoutMiddleware(req, protocol, host, pathname)
+  if (nextPathname.startsWith("/admin") || nextPathname.startsWith("/api/admin"))
+    return await adminMiddleware(req, protocol, host, pathname)
 
-      return NextResponse.redirect(
-        `${protocol}//${host}/auth/login?p=${pathname}`
-      )
-    }
-
-    return NextResponse.next()
-  }
+  return NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/checkout/:path/'],
+  matcher: ["/checkout/:path/", "/api/admin/:path/", "/admin"],
 }
