@@ -1,4 +1,5 @@
 import mongoose from "mongoose"
+mongoose.set("strictQuery", true)
 
 /**
  * 0 => Disconnected
@@ -21,11 +22,10 @@ export const connect = async () => {
     if (mongoConnection.isConnected === 1) {
       return
     }
-    
+
     await mongoose.disconnect()
   }
-
-  const db = await mongoose.connect(process.env.MONGODB_URI || '')
+  const db = await mongoose.connect(process.env.MONGODB_URI || "")
 
   mongoConnection.isConnected = 1
 

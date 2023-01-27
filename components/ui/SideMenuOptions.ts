@@ -38,6 +38,7 @@ export const icons = {
   VpnKeyOutlined,
   HowToRegOutlinedIcon,
   DashboardOutlined,
+  CategoryOutlined,
 }
 
 export const adminMenu: adminMenuItem[] = [
@@ -55,6 +56,11 @@ export const adminMenu: adminMenuItem[] = [
     label: "Users",
     icon: "AdminPanelSettings",
     url: "/admin/users/",
+  },
+  {
+    label: "Products",
+    icon: "CategoryOutlined",
+    url: "/admin/products/",
   },
 ]
 
