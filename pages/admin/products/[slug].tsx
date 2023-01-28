@@ -1,4 +1,5 @@
-import { FC, useEffect, useState } from "react"
+import { FC, useEffect, useRef, useState } from "react"
+import { useRouter } from "next/router"
 import { GetServerSideProps } from "next"
 import DriveFileRenameOutline from "@mui/icons-material/DriveFileRenameOutline"
 import SaveOutlined from "@mui/icons-material/SaveOutlined"
@@ -31,7 +32,6 @@ import { dbProducts } from "../../../database"
 import { snackbarConfig } from "./../../../config"
 import { shopApi } from "../../../api"
 import { Product } from "../../../models"
-import { useRouter } from "next/router"
 
 const validTypes = ["shirts", "pants", "hoodies", "hats"]
 const validGender = ["men", "women", "kid", "unisex"]
@@ -59,6 +59,7 @@ interface Props {
 
 const ProductAdminPage: FC<Props> = ({ product }) => {
   const [newTagValue, setNewTagValue] = useState("")
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const [isSaving, setIsSaving] = useState(false)
   const {
@@ -121,6 +122,16 @@ const ProductAdminPage: FC<Props> = ({ product }) => {
     setValue("sizes", [...currentSizes, size], {
       shouldValidate: true,
     })
+  }
+
+  const onFilesSelected = async ({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    if (!target.files || target.files.length === 0) return
+
+    const formData = new FormData()
+    for (const file of target.files) {
+      formData.append("file", file)
+      const { data } = await shopApi.post<{ message: string }>("/admin/upload", formData)
+    }
   }
 
   const onSubmit = async (formData: FormData) => {
@@ -335,9 +346,22 @@ const ProductAdminPage: FC<Props> = ({ product }) => {
 
             <Box display="flex" flexDirection="column">
               <FormLabel sx={{ mb: 1 }}>Images</FormLabel>
-              <Button color="secondary" fullWidth startIcon={<UploadOutlined />} sx={{ mb: 3 }}>
+              <Button
+                color="secondary"
+                fullWidth
+                startIcon={<UploadOutlined />}
+                sx={{ mb: 3 }}
+                onClick={() => fileInputRef.current?.click()}>
                 Load image
               </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept="image/png, image/gif, image/jpeg"
+                style={{ display: "none" }}
+                onChange={onFilesSelected}
+              />
 
               <Chip label="Yo may upload at least 2 images" color="error" variant="outlined" />
 
