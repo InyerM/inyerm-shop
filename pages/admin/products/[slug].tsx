@@ -127,11 +127,36 @@ const ProductAdminPage: FC<Props> = ({ product }) => {
   const onFilesSelected = async ({ target }: React.ChangeEvent<HTMLInputElement>) => {
     if (!target.files || target.files.length === 0) return
 
-    const formData = new FormData()
-    for (const file of target.files) {
-      formData.append("file", file)
-      const { data } = await shopApi.post<{ message: string }>("/admin/upload", formData)
+    try {
+      for (const file of target.files) {
+        const formData = new FormData()
+        formData.append("file", file)
+        const { data } = await shopApi.post<{ message: string }>("/admin/upload", formData)
+        setValue("images", [...getValues("images"), data.message], {
+          shouldValidate: true,
+        })
+      }
+
+      enqueueSnackbar("Images uploaded successfully", {
+        variant: "success",
+        ...snackbarConfig,
+      })
+    } catch (error: any) {
+      enqueueSnackbar(error.message, {
+        variant: "error",
+        ...snackbarConfig,
+      })
     }
+  }
+
+  const onDeleteImage = (image: string) => {
+    setValue(
+      "images",
+      getValues("images").filter((i) => i !== image),
+      {
+        shouldValidate: true,
+      },
+    )
   }
 
   const onSubmit = async (formData: FormData) => {
@@ -363,20 +388,20 @@ const ProductAdminPage: FC<Props> = ({ product }) => {
                 onChange={onFilesSelected}
               />
 
-              <Chip label="Yo may upload at least 2 images" color="error" variant="outlined" />
+              <Chip
+                label="Yo may upload at least 2 images"
+                color="error"
+                variant="outlined"
+                sx={{ display: getValues("images").length < 2 ? "flex" : "none" }}
+              />
 
               <Grid container spacing={2}>
-                {product.images.map((img) => (
+                {getValues("images").map((img) => (
                   <Grid item xs={4} sm={3} key={img}>
                     <Card>
-                      <CardMedia
-                        component="img"
-                        className="fadeIn"
-                        image={`/products/${img}`}
-                        alt={img}
-                      />
+                      <CardMedia component="img" className="fadeIn" image={img} alt={img} />
                       <CardActions>
-                        <Button fullWidth color="error">
+                        <Button fullWidth color="error" onClick={() => onDeleteImage(img)}>
                           Delete
                         </Button>
                       </CardActions>

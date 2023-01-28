@@ -4,6 +4,9 @@ import { db } from "../../../database"
 import { IProduct } from "../../../interfaces"
 import { Product } from "../../../models"
 
+import { v2 as cloudinary } from "cloudinary"
+cloudinary.config(process.env.CLOUDINARY_URL || "")
+
 type Data = { message: string } | IProduct[] | IProduct
 
 export default function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
@@ -24,7 +27,14 @@ async function getProducts(req: NextApiRequest, res: NextApiResponse<Data>) {
   const products = await Product.find({}).sort({ title: "asc" }).lean()
   await db.disconnect()
 
-  return res.status(200).json(products)
+  const updatedProducts = products.map((product) => {
+    product.images = product.images.map((image: string) =>
+      image.startsWith("https") ? image : `/products/${image}`,
+    )
+    return product
+  })
+
+  return res.status(200).json(updatedProducts)
 }
 
 async function createProduct(req: NextApiRequest, res: NextApiResponse<Data>) {
@@ -58,6 +68,14 @@ async function updateProduct(req: NextApiRequest, res: NextApiResponse<Data>) {
       await db.disconnect()
       return res.status(404).json({ message: "Product not found" })
     }
+
+    product.images.forEach(async (image) => {
+      if (!images.includes(image)) {
+        const [fileId, extension] = image.substring(image.lastIndexOf("/") + 1).split(".")
+        await cloudinary.uploader.destroy(fileId)
+      }
+    })
+
     await product.updateOne(req.body)
     await db.disconnect()
 

@@ -46,7 +46,7 @@ export const CartProduct: FC<Props> = ({ product, editable = false }) => {
           <CardActionArea>
             <CardMedia
               component="img"
-              image={`/products/${product.image}`}
+              image={product.image}
               alt={product.title}
               sx={{ borderRadius: "5px" }}
             />

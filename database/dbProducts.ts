@@ -20,6 +20,10 @@ export const getProductBySlug = async (slug: string): Promise<IProduct | null> =
 
     await db.disconnect()
 
+    product.images = product.images.map((image: string) =>
+      image.startsWith("https") ? image : `/products/${image}`,
+    )
+
     return JSON.parse(JSON.stringify(product))
   } catch (error: any) {
     return null
@@ -45,7 +49,14 @@ export const getProductsByTerm = async (term: string): Promise<IProduct[]> => {
 
   await db.disconnect()
 
-  return products
+  const updatedProducts = products.map((product) => {
+    product.images = product.images.map((image: string) =>
+      image.startsWith("https") ? image : `/products/${image}`,
+    )
+    return product
+  })
+
+  return updatedProducts
 }
 
 export const getAllProducts = async (): Promise<IProduct[]> => {
@@ -55,5 +66,12 @@ export const getAllProducts = async (): Promise<IProduct[]> => {
 
   await db.disconnect()
 
-  return JSON.parse(JSON.stringify(products))
+  const updatedProducts = products.map((product) => {
+    product.images = product.images.map((image: string) =>
+      image.startsWith("https") ? image : `/products/${image}`,
+    )
+    return product
+  })
+
+  return JSON.parse(JSON.stringify(updatedProducts))
 }

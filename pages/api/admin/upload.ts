@@ -1,8 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import { IncomingForm, File } from "formidable"
-import fs from "fs"
-import { v2 as cloudinary } from "cloudinary"
 
+import { v2 as cloudinary } from "cloudinary"
 cloudinary.config(process.env.CLOUDINARY_URL || "")
 
 type Data = {
