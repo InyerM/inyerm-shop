@@ -66,12 +66,6 @@ export const adminMenu: adminMenuItem[] = [
 
 export const clientMenu: clientMenuItem[] = [
   {
-    label: "Profile",
-    icon: "AccountCircleOutlined",
-    auth: true,
-    notLogged: false,
-  },
-  {
     label: "My orders",
     icon: "ConfirmationNumberOutlined",
     href: "/orders/history",
